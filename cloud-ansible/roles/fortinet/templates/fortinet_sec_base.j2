@@ -1,0 +1,164 @@
+# ---------------------------------#
+# Draft Ansible built base Template
+# ---------------------------------#
+config system global
+    set vdom-admin enable
+end
+
+config vdom
+edit root
+config user tacacs+
+    edit "TACACS-SERVER-PDC"
+        set server {{tacplus.svrs[0]}}
+        set port 49
+        set key {{tacplus.secret}}
+        set authen-type auto
+        set authorization enable
+    next
+config user tacacs+
+    edit "TACACS-SERVER-SDC"
+        set server {{tacplus.svrs[1]}}
+        set port 49
+        set key {{tacplus.secret}}
+        set authen-type auto
+        set authorization enable
+end
+config router static
+    edit 1
+        set dst 0.0.0.0/0
+        set gateway {{subnets.mgmt.ip[0]}}.{{subnets.mgmt.gwy[0]}}
+        
+        set device mgmt1
+    next
+end
+end
+config global
+    config system global
+        set admintimeout 300
+        set hostname {{stb_hostname}}
+        set timezone {{timezone}}
+        set admin-concurrent enable
+        set admin-console-timeout 0
+        set admin-lockout-duration 60
+        set admin-lockout-threshold 3
+    end
+end
+config global
+config system interface
+    edit mgmt1
+    set ip {{subnets.mgmt.ip[0]}}.{{stb_mgmt_ip}}/{{subnets.mgmt.mask[0]}}
+       set allowaccess ping https ssh snmp fgfm
+    # Note here that 'set dedicated-to management is deprecated'
+    set dedicated-to management
+next
+    edit mgmt2
+    set ip {{subnets.mgmt.ip[0]}}.{{shrd_mgmt_ip}}/{{subnets.mgmt.mask[0]}}
+    set allowaccess ping https ssh snmp fgfm
+    set dedicated-to management
+next 
+    edit {{ha_hb_port1}}
+    set vdom root
+    set description "Heartbeat Device Port 1"
+    
+next 
+    edit {{ha_hb_port2}}
+    set vdom root
+    set description "Heartbeat Device Port 2"
+
+next 
+    edit {{sess_sync_port1}}
+    set vdom root
+    set description "Session Sync Port1"
+
+next 
+    edit {{sess_sync_port2}}
+    set vdom root
+    set description "Session Sync Port1"
+
+next 
+
+config system cluster-sync
+end
+config global
+config system ha
+    set group-id {{ha_grp_id}}
+    set group-name {{act_hostname}}-clu
+    set mode a-p
+    set password {{ha_pwd}}
+    set hbdev {{ha_hb_port1}} {{ha_hb_port1_pri}} {{ha_hb_port2}} {{ha_hb_port2_pri}}
+    set session-sync-dev {{sess_sync_port1}} {{sess_sync_port2}}
+    set encryption enable
+    set authentication enable
+    set session-pickup enable
+    set ha-mgmt-status enable
+    unset vdom
+    set ha-direct enable
+    set override disable
+    set priority {{ha_standby_priority}}
+    set hb-interval {{ha_hb_int}}
+    set hb-lost-threshold {{ha_hb_lost}}
+    set hello-holddown {{ha_hello_holddown}}
+    set gratuitous-arps enable
+    set arps 5
+    set arps-interval 8
+    set monitor {{lag_ports.ext.name}} {{lag_ports.int.name}}
+    config ha-mgmt-interfaces
+        edit 1
+            set interface mgmt2
+            set gateway {{subnets.mgmt.ip[0]}}.{{subnets.mgmt.gwy[0]}}
+        next
+    end
+end
+config global
+config log syslogd setting
+    set status enable
+    set server {{syslog_svrs[0]}}
+end
+config log syslogd2 setting
+    set status enable
+    set server {{syslog_svrs[1]}}
+end
+config system ntp
+    set ntpsync enable
+    set type custom
+    config ntpserver
+{% for ntp in ntp.svrs %}
+{% set ntp_idx = loop.index %}
+    edit ntpserver-{{ ntp_idx }}
+        set server {{ ntp }}
+{% endfor %}
+    end
+end
+config system snmp sysinfo
+    set status enable
+    set description "CFN FW {{act_device_id}}"
+    set contact-info {{snmp.contact}}
+    set location {{location.country[0]}}-{{location.city[0]}}-{{location.pdc.street[0]}}-FLOOR:{{act_floor}}-RACK:{{act_rack}}-U:{{act_uloc}}
+    set trap-high-cpu-threshold 80
+    set trap-low-memory-threshold 80
+    set trap-log-full-threshold 90
+end
+#SNMP V3 Config
+config system snmp user
+{% for user in snmp.users %}
+{% set user_idx = loop.index -1 %}
+    edit {{ snmp.users[user_idx] }}
+    set auth-proto sha
+    set auth-pwd {{ snmp.auth_string[user_idx] }}
+    set events mem-low ha-switch ha-hb-failure ha-member-up ha-member-down per-cpu-high
+{% for hosts in snmp.v3.trap_targets %}
+{% set host_idx = loop.index -1 %}
+    set notify-hosts {{ snmp.v3.trap_targets[host_idx].ip }}
+{% endfor %}
+    set priv-proto aes 
+    set priv-pwd {{ snmp.priv_string[user_idx] }}
+    set queries enable
+    set query-port 161
+    set security-level auth-priv
+end
+{% endfor %}
+config system central-management
+    set fmg {{forti_mgr_ip}}
+    set fmg-source-ip 0.0.0.0
+end    
+{% include "fortinet_pri_cloud.j2" %}

@@ -1,0 +1,7 @@
+stb_device_id: "02"
+stb_mgmt_ip: 114
+mgmt_int: mgmt0
+stb_rack: 709
+stb_floor: 4
+stb_uloc: 32
+stb_hostname: "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CLS{{stb_device_id}}"

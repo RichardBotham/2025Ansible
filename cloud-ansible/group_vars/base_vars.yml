@@ -1,0 +1,102 @@
+# BASE VARS
+timezone: 55
+location:
+  country:
+    - SG
+  city:
+    - SGP
+  pdc:
+    street:
+      - AR
+  sdc:
+    street:
+      - TH
+# NTP
+ntp:
+  svrs:
+    - 10.111.255.41
+    - 10.112.255.41
+# AUTH
+auth:
+  en_secret:
+    - "@9G#oT8U"
+  bslnet_pwd:
+    - "#Cs8qvB:"  
+# SNMP
+subnets:
+  snmp:
+    - 10.124.66.0
+    - 10.104.66.0
+    - 10.245.0.0
+    - 10.103.3.0
+    - 10.124.3.0
+  mgmt:
+    ip:
+      - 10.111.175
+      - 10.112.175
+    mask:
+      - 24
+    gwy:
+      - 1
+# SNMP
+snmp:
+  users:
+    - ADDM_SNMP_SA
+    - Entuity_SNMP_SA
+    - Cisco_SNMP_SA
+    - Forescout_SNMP_SA
+    - InfoBlox_SNMP_SA
+    - NetBrain_SNMP_SA
+  
+  auth_string:
+    - "t2Ki;#J3"
+    - "+v41;grL"
+    - "$UqK9'CN"
+    - "m2SVt!C@"
+    - "'6UXS$~+"
+    - "Bv%4wlI$"
+  
+  priv_string:
+    - "D87#!f%v"
+    - "J'vIc@vD"
+    - "DY+s5bMQ"
+    - "tTE<*7BS"
+    - "WZ+u`+lX"
+    - "r3jZ1%$M"
+
+  contact: "IP Services ext 31771"
+  v3:
+    trap_targets:
+      - ip: 10.104.3.160
+      - ip: 10.124.3.160
+    pollers:
+      - auth: "^5Keju2b"
+        clients:
+          - 10.124.66.0/24
+          - 10.104.66.0/24
+          - 10.245.0.0/16
+          - 10.104.3.0/24
+          - 10.124.3.0/24
+    community:
+      - Rii9F9kgcKj3rB8CtJQf
+
+  contact_info: 
+    - "Network Operations Ext 31771"
+
+
+# SYSLOG
+syslog_svrs:
+  - 10.111.175.50
+  - 10.112.175.50
+
+# TACACS
+tacplus:
+  secret: "$rQKfv!6"
+  svrs:
+    - 10.124.66.7
+    - 10.104.66.7
+# Entuity Flow servers
+entuity:
+  ip: 10.124.66.194
+# vrf
+mgmt_vrf: management

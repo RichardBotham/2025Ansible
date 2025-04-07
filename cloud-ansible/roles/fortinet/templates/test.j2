@@ -1,0 +1,30 @@
+config system snmp user
+{% for user in snmp.users %}
+{% set user_idx = loop.index -1 %}
+    edit {{ snmp.users[user_idx] }}
+    set auth-proto sha
+    set auth-pwd {{ snmp.auth_string[user_idx] }}
+    set events mem-low ha-switch ha-hb-failure ha-member-up ha-member-down per-cpu-high
+{% for hosts in snmp.v3.trap_targets %}
+{% set host_idx = loop.index -1 %}
+    set notify-hosts {{ snmp.v3.trap_targets[host_idx].ip }}
+{% endfor %}
+    set priv-proto aes 
+    set priv-pwd {{ snmp.priv_string[user_idx] }}
+    set queries enable
+    set query-port 161
+    set security-level auth-priv
+end
+{% endfor %}
+
+config system ntp
+    set ntpsync enable
+    set type custom
+    config ntpserver
+{% for ntp in ntp.svrs %}
+{% set ntp_idx = loop.index %}
+    edit ntpserver-{{ ntp_idx }}
+        set server {{ ntp }}
+{% endfor %}
+    end
+end

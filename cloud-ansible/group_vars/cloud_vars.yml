@@ -1,0 +1,68 @@
+# INTERFACES
+cloud_broker_a: MEGAPORT
+cloud_broker_b: EQUINIX
+# Note here that the max chars for a vdom name is 11
+vdom_descr: PROD-CLOUD
+vdom_name: PROD-CLOUD
+vdom_system_comments: CNF VDOM
+vlan_int_name:
+  - "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{act_device_id}}-TO-ISN-BGP"
+#  - CNF_Primary_ASR_to_ISN_Core_EBGP_peering
+  - "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{stb_device_id}}-TO-ISN-BGP"
+#  - CNF_Secondary_ASR_to_ISN_Core_EBGP_peering
+  - "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{act_device_id}}-TO-{{cloud_broker_a}}-BGP"
+#  - CNF_Primary_ASR_to_Cloud_broker_A_primary_EBGP_peering
+  - "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{stb_device_id}}-TO-{{cloud_broker_a}}-BGP"
+#  - CNF_Secondary_ASR_to_Cloud_broker_A_primary_EBGP_peering
+  - "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{act_device_id}}-TO-{{location.country[0]}}{{location.city[0]}}-{{location.sdc.street[0]}}-CR{{act_device_id}}-BGP"
+#  - CNF_Primary_ASR_inter_DC_EBGP_peering
+  - "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{stb_device_id}}-TO-{{location.country[0]}}{{location.city[0]}}-{{location.sdc.street[0]}}-CR{{stb_device_id}}-BGP"
+#  - CNF_Secondary_ASR_inter_DC_EBGP_Peering
+  - "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{act_device_id}}-TO-{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{stb_device_id}}-BGP"
+#  - CNF_Primary_and_secondary_ASR_IBGP_peering
+vlan_ext_name:
+  - "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{act_device_id}}-TO-{{cloud_broker_a}}-BGP"
+#  - CNF_Primary_ASR_to_Cloud_broker_A_Secondary_EBGP_peering
+  - "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{stb_device_id}}-TO-{{cloud_broker_a}}-BGP"
+#  - CNF_Secondary_ASR_to_Cloud_broker_A_Secondary_EBGP_peering
+  - "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{act_device_id}}-TO-{{cloud_broker_b}}-BGP"
+#  - CNF_Primary_ASR_to_Cloud_broker_B_primary_EBGP_peering
+  - "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{stb_device_id}}-TO-{{cloud_broker_b}}-BGP"
+#  - CNF_Secondary_ASR_to_Cloud_broker_B_primary_EBGP_peering
+  - "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{act_device_id}}-TO-{{cloud_broker_b}}-BGP"
+#  - CNF_Primary_ASR_to_Cloud_broker_B_Secondary_EBGP_peering
+  - "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{stb_device_id}}-TO-{{cloud_broker_b}}-BGP"
+#  - CNF_Secondary_ASR_to_Cloud_broker_B_Secondary_EBGP_peering
+vlan_int:
+  - 2811
+  - 2812
+  - 2813
+  - 2814
+  - 2815
+  - 2816
+  - 2817
+vlan_ext:
+  - 2819
+  - 2820
+  - 2821
+  - 2822
+  - 2823
+  - 2824
+lag_ports:
+  ext:
+    port:
+      - port34
+      - port38
+    desc: LAYER 2 TO CNF ASR
+    name: AGG_EXT
+  int:
+    port:
+      - port33
+      - port37
+    desc: LAYER 2 TO ISN CORE
+    name: AGG_INT
+# Test Vlan
+
+vlans:
+  2811: dave
+  456: "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CR{{act_device_id}}-TO-{{cloud_broker_a}}-BGP"

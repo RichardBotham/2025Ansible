@@ -1,0 +1,7 @@
+act_device_id: "01"
+pri_mgmt_ip: 113
+mgmt_int: mgmt0
+act_rack: 707
+act_floor: 4
+act_uloc: 32
+act_hostname: "{{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CLS{{act_device_id}}"

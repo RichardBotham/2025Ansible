@@ -1,0 +1,18 @@
+# HA
+ha_grp_id: 1
+ha_pwd: test
+ha_hb_int: 2
+ha_hb_lost: 6
+ha_hello_holddown: 20
+ha_hb_port1: port1
+ha_hb_port1_pri: 50
+ha_hb_port2: port2
+ha_hb_port2_pri: 50
+sess_sync_port1: port3
+sess_sync_port2: port4   
+ha_active_priority: 200  
+ha_standby_priority: 100
+# Fortimanager
+forti_mgr_ip: 10.124.66.73
+# Shared mgmt IP
+shrd_mgmt_ip: 117

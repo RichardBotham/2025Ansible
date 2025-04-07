@@ -1,0 +1,459 @@
+ADDM_SNMP_SA
+Entuity_SNMP_SA
+Cisco_SNMP_SA
+Forescout_SNMP_SA
+InfoBlox_SNMP_SA
+NetBrain_SNMP_SA
+Qualys_SNMP_SA
+
+##########################
+Aaron Notes
+NEXUS
+username Bslnetw0rk password 0 <Refer to Key Pass> role network-admin
+ 
+Config
+***Please remember to check the below is still valid with regards to Logging, SNMP, Tacacs etc...***
+ 
+hostname <XXXXX-XX-XXXX>
+! Turn off any features you do not require>
+feature privilege
+feature vrrp
+feature ospf
+feature bgp
+feature pim
+feature msdp
+feature interface-vlan
+feature hsrp
+feature vpc
+feature bfd
+clock timezone GMT 0 0
+feature sflow
+!
+no password strength-check
+username Bslnetw0rk password 0 <Refer to Key Pass> role network-admin
+ 
+enable secret 9 <Refer to Key Pass>
+!
+banner motd #
+ 
+ 
+**********************************************
+* LOGIN ACCESS TO THIS SYSTEM *
+* IS PROHIBITED UNLESS AUTHORISED *
+* ACCESSING PROGRAMS AND DATA UNRELATED *
+* TO YOU IS PROHIBITED *
+**********************************************
+ 
+#
+!
+no ip domain-lookup
+ip domain-name BSL-NETWORK-SVCS
+!
+tacacs-server host 10.124.66.7 key 7 <Refer To Key Pass>
+tacacs-server host 10.104.66.7 key 7 <Refer To Key Pass>
+aaa group server tacacs+ BSL-NETWORKS-TACACS
+server 10.104.66.7
+server 10.124.66.7
+use-vrf <VRF>
+source-interface <Interface> If Vlan interface will need to be created before this is applied
+!
+crypto key generate rsa label <Hostname> modulus 2048
+!
+ip access-list AL-BSL-NETWORK-SVCS
+10 permit ip 10.104.66.0 0.0.0.255 any
+20 permit ip 10.124.66.0 0.0.0.255 any
+30 permit ip 10.245.0.0 0.0.255.255 any
+!
+copp profile strict
+!
+snmp-server enable traps
+snmp ifmib ifalias long
+snmp-server contact Network Operations Ext 31771
+snmp-server location <Example GBLND-ES02 B2 O03>
+snmp-server source-interface traps <Interface>If Vlan interface will need to be created before this is applied
+CHECK FIRST FOR REGION SPECIFIC - Enter these manually as the nexus does not like these being cut and pasted
+snmp-server host 10.124.3.160 traps version 2c <Refer to Key Pass>
+snmp-server host 10.104.3.160 traps version 2c <Refer to Key Pass>
+snmp-server community <Refer to Key Pass> group network-operator
+snmp-server community <Refer to Key Pass> use-ipv4acl AL-BSL-NETWORK-SVCS
+!
+CHECK FIRST FOR REGION SPECIFIC
+ntp server 10.104.66.45 use-vrf <VRF>
+ntp server 10.104.66.46 use-vrf <VRF>
+ntp server 10.124.66.150 prefer use-vrf <VRF>
+ntp server 10.124.66.151 use-vrf <VRF>
+ntp source-interface <Interface> If Vlan interface will need to be created before this is applied
+!
+vlan 900
+name NATIVE-VLAN
+!
+vlan 999
+shutdown
+name UNUSED-PORTS
+!
+spanning-tree mode rapid-pvst
+spanning-tree vlan XXXX priority XXXXX
+spanning-tree bridge assurance
+spanning-tree port type edge default
+spanning-tree port type edge bpduguard default
+spanning-tree port type edge bpdufilter default
+spanning-tree loopguard default
+!
+udld aggressive
+!
+vrf context management
+flow exporter ENTUITY-EXPORTER
+CHECK FIRST FOR REGION SPECIFIC
+destination 10.124.66.183 use-vrf <VRF>
+transport udp 9996
+source mgmt0 If Vlan interface will need to be created before this is applied
+version 9
+template data timeout 20
+flow record NETFLOW-IPV4-RECORD
+match ipv4 source address
+match ipv4 destination address
+match transport destination-port
+collect counter bytes
+collect counter packets
+flow monitor NETFLOW-IPV4-MONITOR
+record NETFLOW-IPV4-RECORD
+exporter ENTUITY-EXPORTER
+!
+interface Vlan1
+shutdown
+!
+interface Ethernet1/1 - 54
+shutdown
+description Spare
+switchport
+switchport access vlan 999
+!
+interface mgmt0
+vrf member <VRF>
+ip address <IP ADD/MASK>
+!
+line console
+exec-timeout 10
+line vty
+session-limit 10
+exec-timeout 10
+access-class AL-BSL-NETWORK-SVCS in
+!
+boot nxos bootflash:/<Image>
+!
+logging event link-status default
+CHECK FIRST FOR REGION SPECIFIC
+logging server 10.124.22.126 6 use-vrf <VRF>
+logging server 10.104.22.126 6 use-vrf <VRF>
+logging source-interface <Interface>If Vlan interface will need to be created before this is applied
+no logging console
+!
+aaa authentication login default group BSL-NETWORKS-TACACS
+aaa authorization config-commands default group BSL-NETWORKS-TACACS local
+aaa authorization commands default group BSL-NETWORKS-TACACS local
+aaa accounting default group BSL-NETWORKS-TACACS
+aaa authentication login console local
+!
+end
+copy run start
+ 
+ 
+SNMP NEXUS
+ 
+Configuration
+Cisco Nexus
+ACL V1 - Cisco NXOS
+ip access-list BSL-NETWORK-SVCS_SNMP_V1
+permit udp 10.104.66.0 0.0.0.255 any eq snmp
+permit udp 10.124.66.0 0.0.0.255 any eq snmp
+permit udp 10.245.0.0 0.0.255.255 any eq snmp
+Cisco NX-OS (WIP - subject to testing)
+snmp-server location <Site MNE> <Floor> <Rack > example GBLND-ES B2 F01
+snmp-server user <username> network-operator
+snmp-server user <username> auth sha <KeePass auth string> priv aes-128 <KeePass priv string>
+snmp-server user <username> snmp use-ipv4 AL-BSL-NETWORK-SVCS
+snmp-server host 10.124.3.160 traps version 3 priv <KeyPass priv string>
+snmp-server host 10.104.3.160 traps version 3 priv <KeyPass priv string>
+snmp-server host 10.124.3.160 use-vrf management
+snmp-server host 10.104.3.160 use-vrf management
+ 
+ 
+SSH NEXUS
+crypto key generate rsa label <Hostname> modulus 2048
+ 
+Kind Regards
+Rich
+ 
+Rich Botham
+Senior Network Architect
+London Stock Exchange Group
+ 
+Telephone +44 (0) 207 797 2052
+Mobile + 44 (0)7970 354318
+Switchboard +44 (0) 207 797 1000
+rbotham@lseg.com
+ 
+10 Paternoster Square, London EC4M 7LS
+ 
+www.lseg.com
+ 
+
+
+ 
+Conference Bridge Details
+ 
+To Join the audio call please dial;
+ 
+33210 (Internal)
+ 
+UK: +44-20-7797-3210
+UK: +44-20-7797-1231
+UK: +44-20-7426-7474
+ITL: +39-02-7242-6036
+LKR: +94-11-2416888
+US: +1-855-818-1534
+US: + 1-212-513-5631
+AUS: + 61-28-259-4120
+FR: + 33-17-037-4211
+HK: +852 2164 3290
+ 
+When prompted enter the meeting ID number: 32052 and the # key
+ 
+From: Lyon, Aaron <ALyon@lseg.com> 
+Sent: 20 May 2020 08:51
+To: Botham, Richard <RBotham@lseg.com>; Fernando, Suran <SFernando7@lseg.com>; Brown, Jonathan <jonathan.brown@lseg.com>
+Cc: Butler, Keith <KButler@lseg.com>; Chitty, Dan <DChitty@lseg.com>
+Subject: RE: Cloud Config Review
+ 
+Feedback on the switch configuration;
+ 
+DONE You have enabled both the netflow and sflow feature but you only need to enable netflow
+DONE The login banner is not the standard one
+DONE I don’t see the local account being configured
+DONE SNMP contact standard is not the standard one
+DONE SNMPV3 should be enabled only and all of the accounts are held in Keepass. There should be no SNMP v2
+Entuity
+Cisco CSPC
+Forescout
+Netbrain
+Infoblox
+ADDM
+Your SNMP trap config needs changing to send to Singapore Entuity poller 10.124.66.194 I am not sure what all of the below is;
+ 
+snmp-server host 10.104.3.160 traps version 2c ^5Keju2b
+snmp-server host 10.104.3.160 use-vrf management
+snmp-server host 10.124.3.160 use-vrf management
+snmp-server host 10.124.3.160 traps version 2c ^5Keju2b
+!
+snmp-server community 10.104.3.160 group network-operator
+ 
+DONE You have the components for SSH but I don’t see the key being created with the modulus size
+ 
+
+
+
+
+
+##########################
+
+VLAN ID
+Description
+FW 2811 CNF Primary ASR to ISN Core EBGP peering
+FW 2812 CNF Secondary ASR to ISN Core EBGP peering
+2813 CNF Primary ASR to Cloud broker A primary EBGP peering
+2814 CNF Secondary ASR to Cloud broker A primary EBGP peering
+FW 2815 CNF Primary ASR inter DC EBGP peering
+FW 2816 CNF Secondary ASR inter DC EBGP Peering
+2817 Primary and secondary ASR IBGP peering
+2818 Reserve
+2819 CNF Primary ASR to Cloud broker A Primary EBGP peering
+2820 CNF Secondary ASR to Cloud broker A Secondary EBGP peering
+2821 CNF Primary ASR to Cloud broker B primary EBGP peering
+2822 CNF Secondary ASR to Cloud broker B primary EBGP peering
+2823 CNF Primary ASR to Cloud broker B Secondary EBGP peering
+2824 CNF Secondary ASR to Cloud broker B Secondary EBGP peering
+
+
+Make
+Model
+Device Name
+Site
+Cab Location
+U Position
+Fortigate
+Fortinet 1500D
+SGSGP-AR-CFW1
+SG3
+707
+2..3
+Cisco
+Nexus 9300
+SGSGP-AR-PF-1
+SG3
+707
+32
+Fortigate
+Fortinet 1500D
+SGSGP-AR-CFW2
+SG3
+709
+2..3
+Cisco
+Nexus 9300
+SGSGP-AR-PF-2
+SG3
+709
+
+
+
+SG3
+10.111.255.x
+Router1                111
+Router2                112        
+Sw1                  113
+Sw2                  114
+Fw1                  115
+Fw2                  116
+Fw shared         117
+ 
+SG2
+10.112.255.x
+Router1                111
+Router2                112        
+Sw1                  113
+Sw2                  114
+Fw1                  115
+Fw2                  116
+Fw shared         117
+ 
+
+#======================================================================
+config system global
+    set alias "fortinet2t"
+    set hostname "fortinet2t"
+    set timezone 04
+end
+
+config system vdom-property
+    edit "root"
+        set description "root vdom for amanagement"
+    next
+    edit "cloud"
+        set description "cloud vdom for traffic"
+    next
+end
+
+config system cluster-sync
+end
+
+config system ntp
+    set ntpsync enable
+end 
+
+config system dns
+    set primary 208.91.112.53
+    set secondary 208.91.112.52
+end
+
+config system snmp sysinfo
+    set status enable
+    set description "CFN FW 1"
+    set contact-info "netops@lseg.com - 0207 797 1234"
+    set location "GB ES PDC"
+end
+config system snmp community
+    edit 1
+        set name "dave"
+        config hosts
+            edit 1
+                set ip 120.120.100.1 255.255.255.255
+            next
+        end
+    next
+end
+
+
+config vdom
+edit cloud
+config system interface
+    edit "port2"
+        set description "LAYER 2 TO ISN CORE 1"
+        set vdom "cloud"
+        set allowaccess ping https ssh http
+        set type physical
+        set lldp-reception enable
+        set lldp-transmission enable
+next
+    edit "vlan2811-cloud"
+        set description "PDC CNF PRIMARY ASR TO ISN CORE"
+        set vdom "cloud"
+        set forward-domain 2811
+        set device-identification enable
+        set role lan
+        set interface "port2"
+        set vlanid 2811
+next
+    edit "vlan2812-cloud"
+        set description "PDC CNF SECONDARY ASR TO ISN CORE"
+        set vdom "cloud"
+        set forward-domain 2812
+        set device-identification enable
+        set role lan
+        set interface "port2"
+        set vlanid 2812
+next
+    edit "vlan2815-cloud"
+        set description "PDC CNF PRIMARY ASR TO SDC PRIMARY CNF ASR"
+        set vdom "cloud"
+        set forward-domain 2815
+        set device-identification enable
+        set role lan
+        set interface "port2"
+        set vlanid 2815
+next
+    edit "vlan2816-cloud"
+        set description "PDC CNF SECONDAY ASR TO SDC SECONDARY CNF ASR"
+        set vdom "cloud"
+        set forward-domain 2816
+        set device-identification enable
+        set role lan
+        set interface "port2"
+        set vlanid 2816
+next
+   edit "vlan2811-onprem"
+        set description "PDC CNF PRIMARY ASR TO ISN CORE"
+        set vdom "cloud"
+        set forward-domain 2811
+        set device-identification enable
+        set role lan
+        set interface "port1"
+        set vlanid 2811
+next
+    edit "vlan2812-onprem"
+        set description "PDC CNF SECONDARY ASR TO ISN CORE"
+        set vdom "cloud"
+        set forward-domain 2812
+        set device-identification enable
+        set role lan
+        set interface "port1"
+        set vlanid 2812
+next
+    edit "vlan2815-onprem"
+        set description "PDC CNF PRIMARY ASR TO SDC PRIMARY CNF ASR"
+        set vdom "cloud"
+        set forward-domain 2815
+        set device-identification enable
+        set role lan
+        set interface "port1"
+        set vlanid 2815
+next
+    edit "vlan2816-onprem"
+        set description "PDC CNF SECONDAY ASR TO SDC SECONDARY CNF ASR"
+        set vdom "cloud"
+        set forward-domain 2816
+        set device-identification enable
+        set role lan
+        set interface "port1"
+        set vlanid 2816
+end
+end

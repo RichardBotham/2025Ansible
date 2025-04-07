@@ -1,0 +1,24 @@
+---
+- name: Push Cloud Nexus Config Build Test
+  hosts: nxos
+  connection: local
+  gather_facts: False
+
+  
+  tasks:
+    - name: Push Cloud Nexus Config Build Test
+      nxos_config:
+        src: ./roles/cisco/config_repo/test.cfg
+        save_when: changed        
+
+    
+    - name: Configure Banner
+      nxos_banner:
+        banner: motd
+        text: |
+          ####################################################################
+          This system is private property
+          Unauthorised access is not permitted and may constitute an offence
+          IF YOU ARE NOT AN AUTHORISED USER DISCONNECT IMMEDIATELY
+          ####################################################################
+        state: present

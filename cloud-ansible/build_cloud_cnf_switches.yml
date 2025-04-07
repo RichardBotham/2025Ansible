@@ -1,0 +1,17 @@
+---
+- name: Build CNF Switch Configuration
+  hosts: localhost
+  connection: local
+  gather_facts: True
+
+  vars_files:
+    - ./group_vars/base_vars.yml
+    - ./group_vars/cloud_vars.yml
+    - ./group_vars/fw_base_vars.yml
+    - ./host_vars/pri_cnf_sw.yml
+    - ./host_vars/stb_cnf_sw.yml
+  tasks:
+    - name: Build CNF Switches
+      include_role:
+        name: cisco
+  

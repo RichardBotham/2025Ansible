@@ -1,0 +1,17 @@
+---
+- name: Build Primary CNF Firewall Base
+  template:
+    src: fortinet_pri_base.j2
+    dest: roles/fortinet/config_repo/{{act_hostname}}-ansible-build-{{ansible_date_time.date}}-{{ansible_date_time.time}}.cfg
+  
+- name: Build Secondary CNF Firewall Base
+  template:
+    src: fortinet_sec_base.j2
+    dest: roles/fortinet/config_repo/{{stb_hostname}}-ansible-build-{{ansible_date_time.date}}-{{ansible_date_time.time}}.cfg
+
+
+
+#- name: Build Primary CNF Firewall Base
+#  template:
+#    src: test.j2
+#    dest: roles/fortinet/config_repo/test.cfg

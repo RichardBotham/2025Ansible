@@ -1,0 +1,159 @@
+hostname {{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CLS{{stb_device_id}}
+!
+vdc {{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CLS{{stb_device_id}} id 1
+  limit-resource vlan minimum 16 maximum 4094
+  limit-resource vrf minimum 2 maximum 4096
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 248 maximum 248
+  limit-resource u6route-mem minimum 96 maximum 96
+  limit-resource m4route-mem minimum 58 maximum 58
+  limit-resource m6route-mem minimum 8 maximum 8
+!
+crypto key generate rsa label {{ stb_hostname }} modulus 2048
+!
+username Bslnetw0rk password 0 {{ auth.bslnet_pwd[0] }} role network-admin
+!
+enable secret {{ auth.en_secret[0] }}
+!
+feature tacacs+
+feature privilege
+feature bgp
+feature pim
+feature ospf
+feature msdp
+feature udld
+feature interface-vlan
+feature hsrp
+feature lacp
+feature vpc
+feature lldp
+feature bfd
+feature netflow
+!
+no password strength-check
+!
+system vlan long-name
+¡
+no ip domain-lookup
+ip domain-name BSL-NETWORK-SVCS
+no service unsupported-transceiver
+vlan dot1Q tag native
+copp profile strict
+!
+rmon event 1 log trap public description FATAL(1) owner PMON@FATAL
+rmon event 2 log trap public description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 log trap public description ERROR(3) owner PMON@ERROR
+rmon event 4 log trap public description WARNING(4) owner PMON@WARNING
+rmon event 5 log trap public description INFORMATION(5) owner PMON@INFO
+!
+flow exporter ENTUITY-EXPORTER
+destination {{entuity.ip}} use-vrf {{ mgmt_vrf }}
+transport udp 9996
+source {{ mgmt_int }}
+version 9
+template data timeout 20
+flow record NETFLOW-IPV4-RECORD
+match ipv4 source address
+match ipv4 destination address
+match transport destination-port
+collect counter bytes
+collect counter packets
+flow monitor NETFLOW-IPV4-MONITOR
+record NETFLOW-IPV4-RECORD
+exporter ENTUITY-EXPORTER
+spanning-tree port type edge default
+spanning-tree port type edge bpduguard default
+spanning-tree loopguard default
+!
+banner motd #
+ 
+
+**********************************************
+* LOGIN ACCESS TO THIS SYSTEM *
+* IS PROHIBITED UNLESS AUTHORISED *
+* ACCESSING PROGRAMS AND DATA UNRELATED *
+* TO YOU IS PROHIBITED *
+**********************************************
+ 
+#
+
+!
+# TESTED
+# TACACS
+aaa authentication login default group BSL-NETWORKS-TACACS
+aaa authorization config-commands default group BSL-NETWORKS-TACACS local
+aaa authorization commands default group BSL-NETWORKS-TACACS local
+aaa accounting default group BSL-NETWORKS-TACACS
+aaa authentication login console local
+!
+{% for svr in tacplus.svrs %}
+tacacs-server host {{ svr }} key 7 "{{ tacplus.secret }}"
+{% endfor %}
+!
+aaa group server tacacs+ LDN-AAA 
+{% for svr in tacplus.svrs %}
+    server {{ svr }}
+{% endfor %}
+    use-vrf {{ mgmt_vrf }}
+source-interface {{ mgmt_int }}
+!
+# TESTED
+# ACLS
+ip access-list AL-BSL-NETWORK-SVCS
+{% set acl_idx = 5 %}
+{% for entries in snmp.v3.pollers[0].clients %}
+{% set acl_seq = loop.index %}
+{% set acl_idx = acl_idx * acl_seq %}
+    {{ acl_idx }} permit ip {{ entries }} any 
+{% endfor %}
+!
+# TESTED
+# SNMP
+snmp-server enable traps
+snmp ifmib ifalias long
+snmp-server contact Network Operations Ext 31771
+snmp-server source-interface traps {{ mgmt_int }}
+snmp-server location {{ location.country[0] }}{{ location.city[0] }}-{{ location.pdc.street[0] }} {{ stb_floor }} {{ stb_rack }} {{ stb_uloc }}
+
+
+{% for user in snmp.users %}
+{% set snmp_idx = loop.index -1 %}
+snmp-server user {{ user }} network-operator
+snmp-server user {{ user }} auth sha {{ snmp.auth_string[snmp_idx] }} priv aes-128 {{ snmp.priv_string[snmp_idx] }}
+snmp-server user {{ user }} snmp use-ipv4 AL-BSL-NETWORK-SVCS
+{% endfor %}
+
+snmp-server host {{ snmp.v3.trap_targets[0].ip }} traps version 3 {{ snmp.v3.community[0]}}
+snmp-server host {{ snmp.v3.trap_targets[1].ip }} traps version 3 {{ snmp.v3.community[0]}}
+snmp-server host {{ snmp.v3.trap_targets[0].ip }} use-vrf {{ mgmt_vrf }}
+snmp-server host {{ snmp.v3.trap_targets[1].ip }} use-vrf {{ mgmt_vrf }}
+!
+# TESTED
+# NTP
+clock timezone GMT 0 0 
+{% for svr in ntp.svrs %}
+ntp server {{ svr }} use-vrf {{ mgmt_vrf }}
+{% endfor %}
+ntp server {{ ntp.svrs[0] }} prefer use-vrf {{ mgmt_vrf }}
+ntp source-interface {{ mgmt_int }}
+!
+# TESTED
+# SYSLOG
+{% for svr in syslog_svrs %}
+logging server {{ svr }} 6 use-vrf {{ mgmt_vrf }}
+{% endfor%}
+!
+interface {{mgmt_int}}
+  vrf member {{ mgmt_vrf }}
+  ip address {{subnets.mgmt.ip[0]}}.{{stb_mgmt_ip}}/24    
+!
+line con 0
+exec-timeout 10
+!
+line vty 0 9
+session-limit 10
+exec-timeout 10
+access-class AL-BSL-NETWORK-SVCS in
+transport input ssh
+!
+{% include "stb_cnf_switch-v1.j2" %}

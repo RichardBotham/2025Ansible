@@ -1,0 +1,9 @@
+ansible_python_interpreter: /Library/Frameworks/Python.framework/Versions/3.7/bin/python3
+ansible_network_os: fortios
+ansible_httpapi_use_ssl: False
+ansible_httpapi_validate_certs: False
+ansible_httpapi_timeout: 300
+ansible_username: ansible
+ansible_password: ansible
+ansible_host: fortinet1
+ssl_verify: False

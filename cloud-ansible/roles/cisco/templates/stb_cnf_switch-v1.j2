@@ -1,0 +1,99 @@
+# Cloud Specific
+!
+!
+{% for vlan in vlan_int %}
+{% set v_idx = loop.index - 1  %}
+{% if vlan == 2813 %}
+vlan {{ vlan }}
+    name {{vlan_int_name[v_idx]}}-PRIMARY
+{% elif vlan == 2814 %}
+vlan {{ vlan }}
+    name {{vlan_int_name[v_idx]}}-SECONDARY
+{% else %}    
+vlan {{ vlan }}
+    name {{vlan_int_name[v_idx]}}
+{% endif %}
+{% endfor %}
+!
+{% for vlan in vlan_ext %}
+{% set v_idx = loop.index - 1  %}
+{% if vlan == 2819 or vlan == 2823 or vlan == 2824 %}
+vlan {{ vlan }}
+    name {{vlan_int_name[v_idx]}}-SECONDARY
+{% elif vlan == 2821 or vlan == 2822 %}
+vlan {{ vlan }}
+    name {{vlan_int_name[v_idx]}}-PRIMARY
+{% else %}    
+vlan {{ vlan }}
+    name {{vlan_int_name[v_idx]}}
+{% endif %}
+{% endfor %}
+!
+interface port-channel1
+  description Inter switch link to {{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}CLF-{{stb_device_id}}
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 999
+  switchport trunk allowed vlan {{vlan_int[0]}}-{{vlan_int[6]}},{{vlan_ext[1]}}-{{vlan_ext[5]}}
+  spanning-tree link-type point-to-point
+  spanning-tree port type network
+!
+interface Ethernet1/38
+  description {{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}CLF-{{stb_device_id}}-P-35
+  switchport
+  channel-group 1 mode active
+  no shutdown
+!
+interface Ethernet1/48
+  description {{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}CLF-{{stb_device_id}}-P-35
+  switchport
+  channel-group 1 mode active
+  no shutdown
+!
+interface port-channel100
+  description Firewall link to {{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CLF{{stb_device_id}}
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 999
+  switchport trunk allowed vlan {{vlan_int[0]}}-{{vlan_int[6]}},{{vlan_ext[1]}}-{{vlan_ext[5]}}
+  spanning-tree link-type point-to-point
+  spanning-tree port type network
+!
+interface Ethernet1/0
+  description {{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CLF{{stb_device_id}}-P-35
+  switchport
+  channel-group 100 mode active
+  no shutdown
+!
+interface Ethernet1/1
+  description {{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}-CLF{{stb_device_id}}-P-36
+  switchport
+  channel-group 100 mode active
+  no shutdown
+!
+interface Ethernet1/2
+  description {{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}CLR{{stb_device_id}}-TE0
+  switchport
+  switchport mode trunk
+  switchport trunk allowed vlan {{vlan_int[0]}},{{vlan_ext[4]}},{{vlan_int[6]}}
+  no shutdown
+!
+interface Ethernet1/3
+  description {{location.country[0]}}{{location.city[0]}}-{{location.pdc.street[0]}}CLR{{stb_device_id}}-TE1
+  switchport
+  switchport mode trunk
+  switchport trunk allowed vlan {{vlan_int[2]}},{{vlan_ext[0]}},{{vlan_ext[2]}},{{vlan_ext[4]}}
+  no shutdown
+!
+interface port-channel 200
+  description Inter switch link to {{cloud_broker_a}}
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 999
+  switchport trunk allowed vlan {{vlan_int[2]}}-{{vlan_int[3]}}
+  spanning-tree port type edge
+!
+interface Ethernet1/37
+  description {{cloud_broker_a}}
+  channel-group 200 mode active
+!

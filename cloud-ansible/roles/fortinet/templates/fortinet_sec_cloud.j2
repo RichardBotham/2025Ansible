@@ -1,0 +1,173 @@
+# ---------------------------------#
+# Draft Ansible built Cloud Template
+# ---------------------------------#
+config vdom
+    edit {{vdom_name}}
+    config system settings
+        set comments {{location.country[0]}}-{{location.city[0]}}-CNF VDOM
+        set opmode transparent
+        set manageip {{subnets.mgmt.ip[0]}}.{{stb_mgmt_ip}}/{{subnets.mgmt.mask[0]}}
+end
+config vdom
+edit {{vdom_name}}
+config system interface
+    edit {{lag_ports.ext.port[0]}}
+    set vdom {{vdom_name}}
+    set description "{{lag_ports.ext.port[0]}} Member of {{lag_ports.ext.name}}
+next 
+    edit {{lag_ports.ext.port[1]}}
+    set vdom {{vdom_name}}
+    set description "{{lag_ports.ext.port[1]}} Member of {{lag_ports.ext.name}}
+next 
+    edit {{lag_ports.int.port[0]}}
+    set vdom {{vdom_name}}
+    set description "{{lag_ports.int.port[0]}} Member of {{lag_ports.int.name}}
+next 
+    edit {{lag_ports.int.port[1]}}
+    set vdom {{vdom_name}}
+    set description "{{lag_ports.int.port[1]}} Member of {{lag_ports.int.name}}    
+next
+    edit {{lag_ports.ext.name}}
+        set vdom {{vdom_name}}
+        unset allowaccess
+        set type aggregate
+        set member {{lag_ports.ext.port[0]}} {{lag_ports.ext.port[1]}}
+        set lldp-transmission enable
+        set lacp-speed fast
+next
+    edit {{lag_ports.int.name}}
+        set vdom {{vdom_name}}
+        unset allowaccess
+        set type aggregate
+        set member {{lag_ports.int.port[0]}} {{lag_ports.int.port[1]}}
+        set lldp-transmission enable
+        set lacp-speed fast
+next
+    edit {{lag_ports.int.port[0]}}
+        set description "{{lag_ports.int.name}}"
+        set vdom {{vdom_name}} 
+        unset allowaccess
+        set type physical
+        set lldp-reception enable
+        set lldp-transmission enable
+next
+    edit {{lag_ports.int.port[1]}}
+        set description "{{lag_ports.int.name}}"
+        set vdom {{vdom_name}} 
+        unset allowaccess
+        set type physical
+        set lldp-reception enable
+        set lldp-transmission enable
+next
+    edit {{lag_ports.ext.port[0]}}
+        set description "{{lag_ports.ext.name}}"
+        set vdom {{vdom_name}} 
+        unset allowaccess
+        set type physical
+        set lldp-reception enable
+        set lldp-transmission enable
+next
+    edit {{lag_ports.ext.port[1]}}
+        set description "{{lag_ports.ext.name}}"
+        set vdom {{vdom_name}} 
+        unset allowaccess
+        set type physical
+        set lldp-reception enable
+        set lldp-transmission enable
+next
+    edit vlan-external-{{vlan_int[0]}}
+        set description VLAN-{{vlan_int[0]}}
+        set vdom {{vdom_name}}
+        set forwarding-domain {{vlan_int[0]}}
+        set device-identification enable
+        set role undefined
+        set interface {{lag_ports.ext.name}}
+        set vlanid {{vlan_int[0]}}
+        set bfd enable
+        set bfd-desired-min-tx 2000
+        set bfd-required-min-rx 2000
+next         
+    edit vlan-internal-{{vlan_int[0]}}
+        set description VLAN-{{vlan_int[0]}}
+        set vdom {{vdom_name}}
+        set forwarding-domain {{vlan_int[0]}}
+        set device-identification enable
+        set role undefined
+        set interface {{lag_ports.int.name}}
+        set vlanid {{vlan_int[0]}}
+        set bfd enable
+        set bfd-desired-min-tx 2000
+        set bfd-required-min-rx 2000
+next
+    edit vlan-external-{{vlan_int[1]}}
+        set description VLAN-{{vlan_int[1]}}
+        set vdom {{vdom_name}}
+        set forwarding-domain {{vlan_int[1]}}
+        set device-identification enable
+        set role undefined
+        set interface {{lag_ports.ext.name}}
+        set vlanid {{vlan_int[1]}}
+        set bfd enable
+        set bfd-desired-min-tx 2000
+        set bfd-required-min-rx 2000
+next         
+    edit vlan-internal-{{vlan_int[1]}}
+        set description VLAN-{{vlan_int[1]}}
+        set vdom {{vdom_name}}
+        set forwarding-domain {{vlan_int[1]}}
+        set device-identification enable
+        set role undefined
+        set interface {{lag_ports.int.name}}
+        set vlanid {{vlan_int[1]}}
+        set bfd enable
+        set bfd-desired-min-tx 2000
+        set bfd-required-min-rx 2000
+next
+    edit vlan-external-{{vlan_int[4]}}
+        set description VLAN-{{vlan_int[4]}}
+        set vdom {{vdom_name}}
+        set forwarding-domain {{vlan_int[4]}}
+        set device-identification enable
+        set role undefined
+        set interface {{lag_ports.ext.name}}
+        set vlanid {{vlan_int[4]}}
+        set bfd enable
+        set bfd-desired-min-tx 2000
+        set bfd-required-min-rx 2000
+next         
+    edit vlan-internal-{{vlan_int[4]}}
+        set description VLAN-{{vlan_int[4]}}
+        set vdom {{vdom_name}}
+        set forwarding-domain {{vlan_int[4]}}
+        set device-identification enable
+        set role undefined
+        set interface {{lag_ports.int.name}}
+        set vlanid {{vlan_int[4]}}
+        set bfd enable
+        set bfd-desired-min-tx 2000
+        set bfd-required-min-rx 2000
+next
+    edit vlan-external-{{vlan_int[5]}}
+        set description VLAN-{{vlan_int[5]}}
+        set vdom {{vdom_name}}
+        set forwarding-domain {{vlan_int[5]}}
+        set device-identification enable
+        set role undefined
+        set interface {{lag_ports.ext.name}}
+        set vlanid {{vlan_int[5]}}
+        set bfd enable
+        set bfd-desired-min-tx 2000
+        set bfd-required-min-rx 2000
+next         
+    edit vlan-internal-{{vlan_int[5]}}
+        set description VLAN-{{vlan_int[5]}}
+        set vdom {{vdom_name}}
+        set forwarding-domain {{vlan_int[5]}}
+        set device-identification enable
+        set role undefined
+        set interface {{lag_ports.int.name}}
+        set vlanid {{vlan_int[5]}}
+        set bfd enable
+        set bfd-desired-min-tx 2000
+        set bfd-required-min-rx 2000
+end
