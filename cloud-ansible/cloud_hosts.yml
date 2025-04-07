@@ -1,9 +1,0 @@
-[cloud_fws]
-pri_cnf_fw
-sec_cnf_fw
-[cloud_swt]
-pri_cnf_switch
-stb_cnf_switch
-[nxos]
-nexus_9k_1
-

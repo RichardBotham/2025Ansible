@@ -1,5 +1,5 @@
 ---
-- name: Build CNF Switch Configuration
+- name: Build Cloud Nexus Config Build Test
   hosts: localhost
   connection: local
   gather_facts: False
@@ -7,12 +7,11 @@
   vars_files:
     - ./group_vars/base_vars.yml
     - ./group_vars/cloud_vars.yml
-    - ./group_vars/fw_base_vars.yml
     - ./host_vars/pri_cnf_sw.yml
     - ./host_vars/stb_cnf_sw.yml
   
+  
   tasks:
-    - name: Build CNF Switches
+    - name: Build Primary CNF Switch
       include_role:
         name: ciscopri
-  

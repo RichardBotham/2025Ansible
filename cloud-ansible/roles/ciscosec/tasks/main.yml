@@ -1,0 +1,5 @@
+---
+- name: Build Secondary CNF Switch Base
+  template:
+    src: roles/ciscosec/templates/cisco9k_stb_base.j2
+    dest: roles/ciscosec/config_repo/{{stb_hostname}}.cfg

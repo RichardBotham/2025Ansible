@@ -1,0 +1,8 @@
+[cnfswitch1]
+1.1.1.3
+[cnfswitch2]
+2.2.2.4
+
+
+[firewalls]
+1.1.1.1

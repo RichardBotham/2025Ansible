@@ -1,6 +1,6 @@
 ---
-- name: Build CNF Firewall Configuration
-  hosts: cloud_fws
+- name: Build CNF Infrastrcuture Configuration
+  hosts: firewalls
   connection: local
   gather_facts: True
 

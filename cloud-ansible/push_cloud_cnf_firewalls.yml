@@ -1,6 +1,6 @@
 ---
-- name: Build CNF Switch Configuration
-  hosts: localhost
+- name: Push CNF Firewalls Configuration
+  hosts: firewalls
   connection: local
   gather_facts: False
 
@@ -8,11 +8,10 @@
     - ./group_vars/base_vars.yml
     - ./group_vars/cloud_vars.yml
     - ./group_vars/fw_base_vars.yml
-    - ./host_vars/pri_cnf_sw.yml
-    - ./host_vars/stb_cnf_sw.yml
+    - ./host_vars/pri_cnf_fw.yml
+    - ./host_vars/stb_cnf_fw.yml
   
   tasks:
-    - name: Build CNF Switches
+    - name: Build CNF Firewalls
       include_role:
-        name: ciscopri
-  
+        name: fortinet

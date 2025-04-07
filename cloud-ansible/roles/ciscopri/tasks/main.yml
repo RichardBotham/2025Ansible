@@ -1,0 +1,5 @@
+---
+- name: Build Primary CNF Switch Base
+  template:
+    src: roles/ciscopri/templates/cisco9k_pri_base.j2
+    dest: roles/ciscopri/config_repo/{{act_hostname}}.cfg

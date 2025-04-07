@@ -1,0 +1,18 @@
+---
+- name: Push CNF Primary Switch Configuration
+  hosts: cnfswitch1
+  gather_facts: False
+
+
+  vars_files:
+    - ./group_vars/base_vars.yml
+    - ./group_vars/cloud_vars.yml
+    - ./group_vars/fw_base_vars.yml
+    - ./host_vars/pri_cnf_sw.yml
+    - ./group_vars/nxos.yml
+  
+  tasks:
+    - name: Push Cloud Nexus Config Build Test
+      nxos_config:
+        src: ./roles/ciscopri/config_repo/{{act_hostname}}.cfg
+        save_when: changed        

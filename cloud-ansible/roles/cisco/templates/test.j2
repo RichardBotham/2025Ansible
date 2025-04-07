@@ -1,9 +1,0 @@
-
-{% for id, name in vlans.items() %}
-vlan {{ id }}
- {% if id == 2811 or id == 456  %}
- name {{ name }}-PRIMARY
- {% else %}
- name {{ name }}
- {% endif %}
- {% endfor %}
