@@ -2,7 +2,7 @@
 - name: Build Primary CNF Switch Base
   template:
     src: roles/cisco/templates/cisco9k_pri_base.j2
-    dest: roles/cisco/config_repo/{{act_hostname}}-ansible-build-{{ansible_date_time.date}}-{{ansible_date_time.time}}.cfg
+    dest: roles/cisco/config_repo/{{act_hostname}}.cfg
   
 
 #- name: Build Standby CNF Switch Base

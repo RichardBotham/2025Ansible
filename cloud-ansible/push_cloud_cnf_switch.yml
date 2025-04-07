@@ -4,8 +4,20 @@
   connection: local
   gather_facts: False
 
+  vars_files:
+    - ./group_vars/base_vars.yml
+    - ./group_vars/cloud_vars.yml
+    - ./group_vars/fw_base_vars.yml
+    - ./host_vars/pri_cnf_sw.yml
+    - ./host_vars/stb_cnf_sw.yml
   
   tasks:
+    - name: Build CNF Switches
+      include_role:
+        name: cisco
+
+
+
     - name: Push Cloud Nexus Config Build Test
       nxos_config:
         src: ./roles/cisco/config_repo/SGSGP-AR-CLS01-ansible-build-2025-04-07-11:33:19.cfg
