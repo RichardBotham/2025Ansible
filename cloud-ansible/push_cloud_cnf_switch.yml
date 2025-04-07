@@ -20,7 +20,7 @@
 
     - name: Push Cloud Nexus Config Build Test
       nxos_config:
-        src: ./roles/cisco/config_repo/SGSGP-AR-CLS01-ansible-build-2025-04-07-11:33:19.cfg
+        src: ./roles/cisco/config_repo/{{ act_hostname }}.cfg
         save_when: changed        
 
     
