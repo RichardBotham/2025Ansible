@@ -70,7 +70,7 @@ snmp:
       - ip: 10.104.3.160
       - ip: 10.124.3.160
     pollers:
-      - auth: "^5Keju2b"
+      - auth: "redacted"
         clients:
           - 10.124.66.0/24
           - 10.104.66.0/24
