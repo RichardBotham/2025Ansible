@@ -12,7 +12,10 @@
     - ./host_vars/stb_cnf_sw.yml
   
   tasks:
-    - name: Build CNF Switches
+    - name: Build CNF Pri Switches
       include_role:
         name: ciscopri
   
+    - name: Build CNF Sec Switches
+      include_role:
+        name: ciscosec

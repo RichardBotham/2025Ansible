@@ -19,9 +19,9 @@ ntp:
 # AUTH
 auth:
   en_secret:
-    - "@9G#oT8U"
+    - "redacted"
   bslnet_pwd:
-    - "#Cs8qvB:"  
+    - "redacted"  
 # SNMP
 subnets:
   snmp:
@@ -49,20 +49,20 @@ snmp:
     - NetBrain_SNMP_SA
   
   auth_string:
-    - "t2Ki;#J3"
-    - "+v41;grL"
-    - "$UqK9'CN"
-    - "m2SVt!C@"
-    - "'6UXS$~+"
-    - "Bv%4wlI$"
+    - "redacted"
+    - "redacted"
+    - "redacted"
+    - "redacted"
+    - "redacted"
+    - "redacted"
   
   priv_string:
-    - "D87#!f%v"
-    - "J'vIc@vD"
-    - "DY+s5bMQ"
-    - "tTE<*7BS"
-    - "WZ+u`+lX"
-    - "r3jZ1%$M"
+    - "redacted"
+    - "redacted"
+    - "redacted"
+    - "redacted"
+    - "redacted"
+    - "redacted"
 
   contact: "IP Services ext 31771"
   v3:
@@ -78,7 +78,7 @@ snmp:
           - 10.104.3.0/24
           - 10.124.3.0/24
     community:
-      - Rii9F9kgcKj3rB8CtJQf
+      - redacted
 
   contact_info: 
     - "Network Operations Ext 31771"
