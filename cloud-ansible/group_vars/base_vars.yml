@@ -91,7 +91,7 @@ syslog_svrs:
 
 # TACACS
 tacplus:
-  secret: "$rQKfv!6"
+  secret: "redacted"
   svrs:
     - 10.124.66.7
     - 10.104.66.7
